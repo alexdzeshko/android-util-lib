@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +26,15 @@ public class CoreActivity extends AppCompatActivity {
         add.commit();
     }
 
-    public void replaceFragment(@IdRes int containerId, @NonNull Fragment fragment) {
-        getSupportFragmentManager().beginTransaction()
-                .replace(containerId, fragment, fragment.getClass().getName())
-                .commit();
+    @SuppressLint("CommitTransaction")
+    public void replaceFragment(@IdRes int containerId, @NonNull Fragment fragment, boolean addToBackStack) {
+        String name = fragment.getClass().getName();
+        FragmentTransaction replaceTransaction = getSupportFragmentManager().beginTransaction()
+                .replace(containerId, fragment, name);
+        if(addToBackStack){
+            replaceTransaction.addToBackStack(name);
+        }
+        replaceTransaction.commit();
     }
 
     public void removeFragment(@NonNull Fragment fragment) {
@@ -95,7 +101,7 @@ public class CoreActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("unchecked")
-    public <V> V findById(@IdRes int id) {
+    public <V extends View> V findById(@IdRes int id) {
         return (V)  findViewById(id);
     }
 }

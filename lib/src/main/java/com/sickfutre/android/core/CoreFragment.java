@@ -108,7 +108,7 @@ public abstract class CoreFragment extends Fragment implements CoreActivity.OnBa
     }
 
     @SuppressWarnings("unchecked")
-    public <V> V findById(@IdRes int id) {
+    public <V extends View> V findById(@IdRes int id) {
         if (getView() != null) {
             return (V) getView().findViewById(id);
         } else {
@@ -121,7 +121,8 @@ public abstract class CoreFragment extends Fragment implements CoreActivity.OnBa
     }
 
     @SuppressWarnings("unchecked")
-    public <V> V findById(@NonNull View view, @IdRes int id) {
+    public <V extends View> V findById(@NonNull View view, @IdRes int id) {
         return (V) view.findViewById(id);
     }
+
 }
