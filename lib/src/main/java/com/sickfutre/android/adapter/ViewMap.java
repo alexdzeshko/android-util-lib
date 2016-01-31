@@ -17,7 +17,7 @@ public class ViewMap extends SparseArray<View> {
 
     public View getView(int id) {
         View view = get(id);
-        if(view == null) {
+        if (view == null) {
             view = parent.findViewById(id);
         }
         return view;
