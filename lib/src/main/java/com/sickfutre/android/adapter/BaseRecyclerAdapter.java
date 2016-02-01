@@ -1,5 +1,6 @@
 package com.sickfutre.android.adapter;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +11,16 @@ import java.util.List;
 
 public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
-    private List<T> mOriginalValues = new ArrayList<T>();
+    private List<T> mOriginalValues;
+
+    public BaseRecyclerAdapter() {
+        mOriginalValues = new ArrayList<T>();
+    }
+
+    public BaseRecyclerAdapter(@NonNull List<T> values) {
+        this();
+        addAll(values);
+    }
 
     @Override public VH onCreateViewHolder(ViewGroup parent, int viewType) {
         return viewHolder(LayoutInflater.from(parent.getContext()), parent, viewType);
@@ -87,10 +97,10 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
         public BaseViewHolder(View itemView) {
             super(itemView);
             views = new ViewMap(itemView);
-            init(views);
+            putViewsIntoMap(views);
         }
 
-        public abstract void init(ViewMap views);
+        public abstract void putViewsIntoMap(ViewMap views);
 
         @SuppressWarnings("unchecked")
         public <T extends View> T get(int viewId) {
