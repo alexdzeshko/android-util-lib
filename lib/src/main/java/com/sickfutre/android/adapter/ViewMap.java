@@ -1,5 +1,7 @@
 package com.sickfutre.android.adapter;
 
+import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.util.SparseArray;
 import android.view.View;
 
@@ -11,11 +13,17 @@ public class ViewMap extends SparseArray<View> {
         this.parent = parent;
     }
 
-    public void put(int id) {
+    public void put(@IdRes int id) {
         put(id, parent.findViewById(id));
     }
 
-    public View getView(int id) {
+    public void put(@NonNull int... ids) {
+        for (int id : ids) {
+            put(id);
+        }
+    }
+
+    public View getView(@IdRes int id) {
         View view = get(id);
         if (view == null) {
             view = parent.findViewById(id);
