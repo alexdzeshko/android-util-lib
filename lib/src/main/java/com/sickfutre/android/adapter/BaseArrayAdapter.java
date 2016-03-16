@@ -66,9 +66,9 @@ public abstract class BaseArrayAdapter<T> extends ArrayAdapter<T> implements IBa
         return view;
     }
 
-    public abstract View newView(Context context, T model, ViewGroup parent, int position);
+    public abstract View newView(Context context, T data, ViewGroup parent, int position);
 
-    public abstract void bindView(View view, T model, int position);
+    public abstract void bindView(View view, T data, int position);
 
     /**
      * Sets the list of data mItems of type .
