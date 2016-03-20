@@ -31,12 +31,16 @@ public class Rndm {
         return (int) (fraction + start);
     }
 
-    public static double gaussian(double mean, double variance){
+    public static double gaussian(double mean, double variance) {
         return mean + getRandomStatic().nextGaussian() * variance;
     }
 
     private static Random getRandomStatic() {
         return getInstance().getRandom();
+    }
+
+    public static <T> T getRandomFrom(T[] objects) {
+        return objects[inRange(0, objects.length - 1)];
     }
 
     private Random getRandom() {
