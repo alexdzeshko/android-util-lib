@@ -56,6 +56,12 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
         notifyItemRangeInserted(size, items.size());
     }
 
+    public void setItems(List<? extends T> items) {
+        mOriginalValues.clear();
+        mOriginalValues.addAll(items);
+        notifyDataSetChanged();
+    }
+
     public void set(int position, T item) {
         mOriginalValues.set(position, item);
         int itemCount = mOriginalValues.size() - position;
