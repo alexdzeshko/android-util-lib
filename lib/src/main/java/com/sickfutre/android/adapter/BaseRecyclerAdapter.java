@@ -5,13 +5,31 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
+
+import com.sickfutre.android.util.Function;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
+        extends RecyclerView.Adapter<VH>
+        implements Filterable {
 
     private List<T> mOriginalValues;
+
+    private Comparator<? super T> mSortComparator;
+    private Function<T, Boolean> mFilter;
+    /**
+     * Lock used to modify the content of . Any write operation
+     * performed on the array should be synchronized on this lock. This lock is also
+     * used by the filter (see {@link #getFilter()} to make a synchronized copy of
+     * the original array of data.
+     */
+    private final Object mLock = new Object();
 
     public BaseRecyclerAdapter() {
         mOriginalValues = new ArrayList<T>();
@@ -22,11 +40,13 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
         addAll(values);
     }
 
-    @Override public VH onCreateViewHolder(ViewGroup parent, int viewType) {
+    @Override
+    public VH onCreateViewHolder(ViewGroup parent, int viewType) {
         return viewHolder(LayoutInflater.from(parent.getContext()), parent, viewType);
     }
 
-    @Override public void onBindViewHolder(VH holder, int position) {
+    @Override
+    public void onBindViewHolder(VH holder, int position) {
         onBindItemViewHolder(holder, getItem(position), position, getItemViewType(position));
     }
 
@@ -34,7 +54,8 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
         return mOriginalValues.get(position);
     }
 
-    @Override public int getItemCount() {
+    @Override
+    public int getItemCount() {
         return mOriginalValues.size();
     }
 
@@ -90,6 +111,74 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
             int itemCount = Math.abs(fromPosition - toPosition) + 1;
             notifyItemRangeChanged(positionStart, itemCount);
         }
+    }
+
+    public void sort(Comparator<? super T> comparator) {
+        synchronized (mLock) {
+            if (mOriginalValues != null) {
+                Collections.sort(mOriginalValues, comparator);
+                notifyDataSetChanged();
+            }
+        }
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence prefix) {
+                FilterResults results = new FilterResults();
+                ArrayList<T> newValues;
+                if (mFilter == null) {
+
+                    synchronized (mLock) {
+                        newValues = new ArrayList<T>(mOriginalValues);
+                    }
+
+                } else {
+
+                    ArrayList<T> values;
+                    synchronized (mLock) {
+                        values = new ArrayList<T>(mOriginalValues);
+                    }
+
+                    final int count = values.size();
+                    newValues = new ArrayList<T>();
+
+                    for (int i = 0; i < count; i++) {
+                        final T value = values.get(i);
+                        if (mFilter.apply(value)) {
+                            newValues.add(value);
+                        }
+                    }
+                }
+                results.values = newValues;
+                results.count = newValues.size();
+                return results;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+
+                setItems(results.values instanceof List ? (List<T>) results.values : null);
+
+            }
+        };
+    }
+
+    public void setFilter(Function<T, Boolean> filter) {
+        mFilter = filter;
+
+        applyFilter();
+    }
+
+    private void applyFilter() {
+        if (mFilter == null) {
+            setItems(mOriginalValues);
+        } else {
+            getFilter().filter("");
+        }
+
     }
 
     protected abstract void onBindItemViewHolder(VH viewHolder, T data, int position, int type);
