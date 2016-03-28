@@ -139,17 +139,9 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
 
                 int position = recyclerView.getChildAdapterPosition(view);
                 if (choiceMode == CHOICE_MODE_SINGLE) {
-                    for (int i = 0; i < selectedItems.size(); i++) {
-                        int posToUnselect = selectedItems.keyAt(i);
-                        if (posToUnselect == position) {
-                            toggleSelection(posToUnselect);
-                        } else {
-                            if (selectedItems.get(posToUnselect)) {
-                                selectedItems.put(posToUnselect, false);
-                                notifyItemChanged(posToUnselect);
-                            }
-                        }
-                    }
+                    toggleSelection(position);
+                    unselectExcluding(position);
+
                 } else if (choiceMode == CHOICE_MODE_MULTIPLE) {
                     toggleSelection(position);
                 }
@@ -170,6 +162,18 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             return false;
+        }
+    }
+
+    private void unselectExcluding(int position) {
+        for (int i = 0; i < selectedItems.size(); i++) {
+            int posToUnselect = selectedItems.keyAt(i);
+            if (posToUnselect != position) {
+                if (selectedItems.get(posToUnselect)) {
+                    selectedItems.put(posToUnselect, false);
+                    notifyItemChanged(posToUnselect);
+                }
+            }
         }
     }
 
