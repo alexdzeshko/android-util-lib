@@ -23,10 +23,19 @@ public class ViewMap extends SparseArray<View> {
         }
     }
 
+    public void click(@IdRes int id, View.OnClickListener onClickListener) {
+        getView(id).setOnClickListener(onClickListener);
+    }
+
+    public void click(View.OnClickListener onClickListener) {
+        parent.setOnClickListener(onClickListener);
+    }
+
     public View getView(@IdRes int id) {
         View view = get(id);
         if (view == null) {
             view = parent.findViewById(id);
+            put(id);
         }
         return view;
     }

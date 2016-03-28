@@ -88,7 +88,7 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
         onBindItemViewHolder(holder, getItem(position), position, getItemViewType(position));
     }
 
-    private T getItem(int position) {
+    protected T getItem(int position) {
         if(mFilter!=null) {
             return mFilteredValues.get(position);
         } else {
@@ -265,12 +265,6 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
 
     }
 
-    protected void setItemsInternal(List<T> rawList) {
-
-
-
-    }
-
     public void set(int position, T item) {
         mOriginalValues.set(position, item);
         int itemCount = mOriginalValues.size() - position;
@@ -389,13 +383,20 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
             super(itemView);
             views = new ViewMap(itemView);
             putViewsIntoMap(views);
+            addClicks(views);
         }
 
-        public abstract void putViewsIntoMap(ViewMap views);
+        protected void addClicks(ViewMap views) {
+
+        }
+
+        protected void putViewsIntoMap(ViewMap views) {
+
+        }
 
         @SuppressWarnings("unchecked")
         public <T extends View> T get(int viewId) {
-            return (T) views.get(viewId);
+            return (T) views.getView(viewId);
         }
 
     }
