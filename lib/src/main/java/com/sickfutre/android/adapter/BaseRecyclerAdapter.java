@@ -20,6 +20,7 @@ import com.sickfutre.android.util.Function;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -32,30 +33,26 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
     public static final int CHOICE_MODE_SINGLE = 1;
     public static final int CHOICE_MODE_MULTIPLE = 2;
 
-    public void setItemSelectedListener(OnItemSelectionChangeListener<T> itemSelectedListener) {
-        this.itemSelectedListener = itemSelectedListener;
-    }
-
     @IntDef({CHOICE_MODE_NONE, CHOICE_MODE_SINGLE, CHOICE_MODE_MULTIPLE})
     @Retention(RetentionPolicy.SOURCE)
     @interface ChoiceMode {
-    }
 
-    private List<T> mOriginalValues;
+    }
+    private List<T> mOriginalValues, mFilteredValues;
 
     private Comparator<? super T> mSortComparator;
-    private Function<T, Boolean> mFilter;
 
+    private Function<T, Boolean> mFilter;
     @ChoiceMode
     private int choiceMode = CHOICE_MODE_NONE;
+
     private SparseBooleanArray selectedItems;
     private OnItemSelectionChangeListener<T> itemSelectedListener;
     GestureDetectorCompat gestureDetector;
-
     public interface OnItemSelectionChangeListener<T> {
+
         void onSelect(boolean isSelected, T data, int position);
     }
-
     /**
      * Lock used to modify the content of . Any write operation
      * performed on the array should be synchronized on this lock. This lock is also
@@ -65,7 +62,8 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
     private final Object mLock = new Object();
 
     public BaseRecyclerAdapter() {
-        mOriginalValues = new ArrayList<T>();
+        mOriginalValues = new ArrayList<>();
+        mFilteredValues = new ArrayList<>();
         selectedItems = new SparseBooleanArray();
     }
 
@@ -91,12 +89,20 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
     }
 
     private T getItem(int position) {
-        return mOriginalValues.get(position);
+        if(mFilter!=null) {
+            return mFilteredValues.get(position);
+        } else {
+            return mOriginalValues.get(position);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mOriginalValues.size();
+        if(mFilter!=null) {
+            return mFilteredValues.size();
+        } else {
+            return mOriginalValues.size();
+        }
     }
 
     @Override
@@ -131,7 +137,7 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
                 return false;
             }
             final int action = MotionEventCompat.getActionMasked(event);
-            if(action == MotionEvent.ACTION_UP) {
+            if (action == MotionEvent.ACTION_UP) {
                 View view = recyclerView.findChildViewUnder(event.getX(), event.getY());
                 if (view == null) {
                     return false;
@@ -163,8 +169,8 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             return false;
         }
-    }
 
+    }
     private void unselectExcluding(int position) {
         for (int i = 0; i < selectedItems.size(); i++) {
             int posToUnselect = selectedItems.keyAt(i);
@@ -184,8 +190,8 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
 
             return gestureDetector.onTouchEvent(event);
         }
-    }
 
+    }
     public void toggleSelection(int pos) {
         if (selectedItems.get(pos, false)) {
             selectedItems.delete(pos);
@@ -218,6 +224,14 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
         return items;
     }
 
+    public void setItemSelectedListener(OnItemSelectionChangeListener<T> itemSelectedListener) {
+        this.itemSelectedListener = itemSelectedListener;
+    }
+
+    public void setSortComparator(Comparator<? super T> mSortComparator) {
+        this.mSortComparator = mSortComparator;
+    }
+
     public void add(int position, T item) {
         mOriginalValues.add(position, item);
         notifyItemInserted(position);
@@ -237,9 +251,24 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
     }
 
     public void setItems(List<? extends T> items) {
-        mOriginalValues.clear();
-        mOriginalValues.addAll(items);
-        notifyDataSetChanged();
+        clear();
+
+        if (items != null) {
+            addAll(items);
+        }
+
+        if (mFilter == null) {
+            notifyDataSetChanged();
+        } else {
+            getFilter().filter("");
+        }
+
+    }
+
+    protected void setItemsInternal(List<T> rawList) {
+
+
+
     }
 
     public void set(int position, T item) {
@@ -319,7 +348,9 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
 
-                setItems(results.values instanceof List ? (List<T>) results.values : null);
+                mFilteredValues.clear();
+                mFilteredValues.addAll((Collection<? extends T>) results.values);
+                notifyDataSetChanged();
 
             }
         };
@@ -328,16 +359,11 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
     public void setFilter(Function<T, Boolean> filter) {
         mFilter = filter;
 
-        applyFilter();
-    }
-
-    private void applyFilter() {
         if (mFilter == null) {
             setItems(mOriginalValues);
         } else {
             getFilter().filter("");
         }
-
     }
 
     public int getChoiceMode() {

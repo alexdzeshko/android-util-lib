@@ -66,7 +66,7 @@ public class CoreActivity extends AppCompatActivity {
     }
 
     public void popFragment() {
-        getFragmentManager().popBackStack();
+        getSupportFragmentManager().popBackStack();
     }
 
     @Override public void onBackPressed() {
