@@ -65,6 +65,10 @@ public class CoreActivity extends AppCompatActivity {
         }
     }
 
+    public void popFragment() {
+        getFragmentManager().popBackStack();
+    }
+
     @Override public void onBackPressed() {
         if (interruptedByListener()) {
             //noinspection UnnecessaryReturnStatement

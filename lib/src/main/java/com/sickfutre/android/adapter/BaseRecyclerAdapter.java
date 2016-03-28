@@ -2,8 +2,11 @@ package com.sickfutre.android.adapter;
 
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,6 +32,10 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
     public static final int CHOICE_MODE_SINGLE = 1;
     public static final int CHOICE_MODE_MULTIPLE = 2;
 
+    public void setItemSelectedListener(OnItemSelectionChangeListener<T> itemSelectedListener) {
+        this.itemSelectedListener = itemSelectedListener;
+    }
+
     @IntDef({CHOICE_MODE_NONE, CHOICE_MODE_SINGLE, CHOICE_MODE_MULTIPLE})
     @Retention(RetentionPolicy.SOURCE)
     @interface ChoiceMode {
@@ -43,7 +50,7 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
     private int choiceMode = CHOICE_MODE_NONE;
     private SparseBooleanArray selectedItems;
     private OnItemSelectionChangeListener<T> itemSelectedListener;
-
+    GestureDetectorCompat gestureDetector;
 
     public interface OnItemSelectionChangeListener<T> {
         void onSelect(boolean isSelected, T data, int position);
@@ -95,43 +102,83 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-        recyclerView.setOnTouchListener(new ItemTouchListener(recyclerView));
+        gestureDetector = new GestureDetectorCompat(recyclerView.getContext(), new GestureListener(recyclerView));
+        recyclerView.setOnTouchListener(new ItemTouchListener());
+
+    }
+
+    private class GestureListener implements GestureDetector.OnGestureListener {
+
+        public GestureListener(RecyclerView recyclerView) {
+            this.recyclerView = recyclerView;
+        }
+
+        RecyclerView recyclerView;
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            return false;
+        }
+
+        @Override
+        public void onShowPress(MotionEvent e) {
+
+        }
+
+        @Override
+        public boolean onSingleTapUp(MotionEvent event) {
+            if (choiceMode == CHOICE_MODE_NONE) {
+                return false;
+            }
+            final int action = MotionEventCompat.getActionMasked(event);
+            if(action == MotionEvent.ACTION_UP) {
+                View view = recyclerView.findChildViewUnder(event.getX(), event.getY());
+                if (view == null) {
+                    return false;
+                }
+
+                int position = recyclerView.getChildAdapterPosition(view);
+                if (choiceMode == CHOICE_MODE_SINGLE) {
+                    for (int i = 0; i < selectedItems.size(); i++) {
+                        int posToUnselect = selectedItems.keyAt(i);
+                        if (posToUnselect == position) {
+                            toggleSelection(posToUnselect);
+                        } else {
+                            if (selectedItems.get(posToUnselect)) {
+                                selectedItems.put(posToUnselect, false);
+                                notifyItemChanged(posToUnselect);
+                            }
+                        }
+                    }
+                } else if (choiceMode == CHOICE_MODE_MULTIPLE) {
+                    toggleSelection(position);
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            return false;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+
+        }
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            return false;
+        }
     }
 
     public class ItemTouchListener implements View.OnTouchListener {
 
-        private RecyclerView recyclerView;
-
-        public ItemTouchListener(RecyclerView recyclerView) {
-            this.recyclerView = recyclerView;
-        }
-
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            if (choiceMode == CHOICE_MODE_NONE) {
-                return false;
-            }
-            View view = recyclerView.findChildViewUnder(event.getX(), event.getY());
-            if (view == null) return false;
 
-            int position = recyclerView.getChildAdapterPosition(view);
-            if (choiceMode == CHOICE_MODE_SINGLE) {
-                for (int i = 0; i < selectedItems.size(); i++) {
-                    int posToUnselect = selectedItems.keyAt(i);
-                    if (posToUnselect == position) {
-                        toggleSelection(posToUnselect);
-                    } else {
-                        if (selectedItems.get(posToUnselect)) {
-                            selectedItems.put(posToUnselect, false);
-                            notifyItemChanged(posToUnselect);
-                        }
-
-                    }
-                }
-            } else if (choiceMode == CHOICE_MODE_MULTIPLE) {
-                toggleSelection(position);
-            }
-            return false;
+            return gestureDetector.onTouchEvent(event);
         }
     }
 
