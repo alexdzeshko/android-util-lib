@@ -133,14 +133,14 @@ public abstract class SectionListAdapter<T> extends BaseAdapter implements Adapt
         return linkedAdapter.getItemViewType(getLinkedPosition(position));
     }
 
-    private View getSectionView(View convertView, final int sectionCode) {
+    private View getSectionView(View convertView, final int sectionCode, ViewGroup parent) {
         View theView = convertView;
 
         if (theView == null) {
 
-            theView = createNewSectionView(inflater);
+            theView = createNewSectionView(inflater, parent);
         } else if (theView.getHeight() == 0) {
-            theView = createNewSectionView(inflater);
+            theView = createNewSectionView(inflater, parent);
         }
         setSectionValue(sectionCode, theView);
         //replaceSectionViewsInMaps(sectionCode, theView);
@@ -149,18 +149,18 @@ public abstract class SectionListAdapter<T> extends BaseAdapter implements Adapt
 
     public abstract void setSectionValue(int sectionCode, final View sectionView);
 
-    public abstract View createNewSectionView(LayoutInflater inflater);
+    public abstract View createNewSectionView(LayoutInflater inflater, ViewGroup parent);
 
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
 
         if (isSection(position)) {
-            return getSectionView(convertView, sectionPositions.get(position));
+            return getSectionView(convertView, sectionPositions.get(position), parent);
         }
         if (linkedAdapter.getCount() > 0) {
             return linkedAdapter.getView(getLinkedPosition(position), convertView, parent);
         }
-        return getSectionView(convertView, -1);//todo take attention
+        return getSectionView(convertView, -1, parent);//todo take attention
     }
 
     @Override
