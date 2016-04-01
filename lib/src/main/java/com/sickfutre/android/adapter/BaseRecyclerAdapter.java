@@ -38,6 +38,7 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
     @interface ChoiceMode {
 
     }
+
     private List<T> mOriginalValues, mFilteredValues;
 
     private Comparator<? super T> mSortComparator;
@@ -49,10 +50,12 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
     private SparseBooleanArray selectedItems;
     private OnItemSelectionChangeListener<T> itemSelectedListener;
     GestureDetectorCompat gestureDetector;
+
     public interface OnItemSelectionChangeListener<T> {
 
         void onSelect(boolean isSelected, T data, int position);
     }
+
     /**
      * Lock used to modify the content of . Any write operation
      * performed on the array should be synchronized on this lock. This lock is also
@@ -89,7 +92,7 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
     }
 
     protected T getItem(int position) {
-        if(mFilter!=null) {
+        if (mFilter != null) {
             return mFilteredValues.get(position);
         } else {
             return mOriginalValues.get(position);
@@ -98,7 +101,7 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
 
     @Override
     public int getItemCount() {
-        if(mFilter!=null) {
+        if (mFilter != null) {
             return mFilteredValues.size();
         } else {
             return mOriginalValues.size();
@@ -171,6 +174,7 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
         }
 
     }
+
     private void unselectExcluding(int position) {
         for (int i = 0; i < selectedItems.size(); i++) {
             int posToUnselect = selectedItems.keyAt(i);
@@ -192,6 +196,7 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
         }
 
     }
+
     public void toggleSelection(int pos) {
         if (selectedItems.get(pos, false)) {
             selectedItems.delete(pos);

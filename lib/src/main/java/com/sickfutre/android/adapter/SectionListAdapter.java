@@ -20,8 +20,8 @@ import java.util.Map;
 public abstract class SectionListAdapter<T> extends BaseAdapter implements AdapterView.OnItemClickListener, IBaseAdapter<T> {
 
     protected final BaseArrayAdapter<T> linkedAdapter;
-    protected final Map<Integer, Integer> sectionPositions = new LinkedHashMap<Integer, Integer>();
-    protected final Map<Integer, Integer> itemPositions = new LinkedHashMap<Integer, Integer>();
+    protected final Map<Integer, Integer> sectionPositions = new LinkedHashMap<>();
+    protected final Map<Integer, Integer> itemPositions = new LinkedHashMap<>();
 
     private int viewTypeCount;
     protected final LayoutInflater inflater;
@@ -136,10 +136,7 @@ public abstract class SectionListAdapter<T> extends BaseAdapter implements Adapt
     private View getSectionView(View convertView, final int sectionCode, ViewGroup parent) {
         View theView = convertView;
 
-        if (theView == null) {
-
-            theView = createNewSectionView(inflater, parent);
-        } else if (theView.getHeight() == 0) {
+        if (theView == null || theView.getHeight() == 0) {
             theView = createNewSectionView(inflater, parent);
         }
         setSectionValue(sectionCode, theView);
