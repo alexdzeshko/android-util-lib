@@ -380,7 +380,7 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
 
     protected abstract VH viewHolder(LayoutInflater inflater, ViewGroup parent, int type);
 
-    public static abstract class BaseViewHolder extends RecyclerView.ViewHolder {
+    public static class BaseViewHolder extends RecyclerView.ViewHolder {
 
         ViewMap views;
 

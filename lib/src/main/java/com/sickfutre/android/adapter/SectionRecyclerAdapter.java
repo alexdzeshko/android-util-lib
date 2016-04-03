@@ -2,16 +2,24 @@ package com.sickfutre.android.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class SectionRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+
     protected BaseRecyclerAdapter<T, VH> linkedAdapter;
     protected Map<Integer, Integer> sectionPositions = new LinkedHashMap<>();
     protected Map<Integer, Integer> itemPositions = new LinkedHashMap<>();
+    private int sectionViewType = hashCode();
+
+    public abstract int sectionCode(T item);
+
+    protected abstract void onBindItemViewHolder(VH viewHolder, int sectionCode, int position);
+
+    protected abstract VH viewHolder(LayoutInflater inflater, ViewGroup parent, int type);
 
     public SectionRecyclerAdapter(BaseRecyclerAdapter<T, VH> linkedAdapter) {
         this.linkedAdapter = linkedAdapter;
@@ -48,21 +56,20 @@ public abstract class SectionRecyclerAdapter<T, VH extends RecyclerView.ViewHold
         });
     }
 
-    public abstract int sectionCode(T item);
-
     protected synchronized void updateSessionCache() {
         int currentPosition = 0;
         sectionPositions.clear();
         itemPositions.clear();
-        String currentSection = null;
+        int currentSection = Integer.MIN_VALUE;
         final int count = linkedAdapter.getItemCount();
         for (int i = 0; i < count; i++) {
 
             final T item = linkedAdapter.getItem(i);
 
-            if (!isTheSame(currentSection, String.valueOf(sectionCode(item)))) {
-                sectionPositions.put(currentPosition, sectionCode(item));
-                currentSection = String.valueOf(sectionCode(item));
+            int sectionCode = sectionCode(item);
+            if (currentSection!= sectionCode) {
+                sectionPositions.put(currentPosition, sectionCode);
+                currentSection = sectionCode;
                 currentPosition++;
             }
             itemPositions.put(currentPosition, i);
@@ -107,19 +114,8 @@ public abstract class SectionRecyclerAdapter<T, VH extends RecyclerView.ViewHold
         return linkedAdapter.getItemViewType(getLinkedPosition(position));
     }
 
-    protected abstract int sectionViewType();
-
-    public abstract void setSectionValue(int sectionCode, final View sectionView);
-
-    public abstract View createNewSectionView(LayoutInflater inflater, ViewGroup parent);
-
-    public synchronized int getCount() {
-        return sectionPositions.size() + itemPositions.size();
-    }
-
-    public synchronized T getItem(final int position) {
-        // TODO: 01-Apr-16 return section item
-        return isSection(position) ? null : linkedAdapter.getItem(getLinkedPosition(position));
+    protected int sectionViewType() {
+        return sectionViewType;
     }
 
     @Override
@@ -129,17 +125,21 @@ public abstract class SectionRecyclerAdapter<T, VH extends RecyclerView.ViewHold
 
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-        return viewHolder(LayoutInflater.from(parent.getContext()), parent, viewType);
+        if(viewType == sectionViewType()) {
+            return viewHolder(LayoutInflater.from(parent.getContext()), parent, viewType);
+        } else {
+            return linkedAdapter.onCreateViewHolder(parent, viewType);
+        }
     }
 
     @Override
     public void onBindViewHolder(VH holder, int position) {
-        onBindItemViewHolder(holder, getItem(position), position, getItemViewType(position));
+        if(isSection(position)) {
+            onBindItemViewHolder(holder, sectionPositions.get(position), position);
+        } else {
+            linkedAdapter.onBindViewHolder(holder, getLinkedPosition(position));
+        }
     }
-
-    protected abstract void onBindItemViewHolder(VH viewHolder, T data, int position, int type);
-
-    protected abstract VH viewHolder(LayoutInflater inflater, ViewGroup parent, int type);
 
     @Override
     public void registerAdapterDataObserver(RecyclerView.AdapterDataObserver observer) {
@@ -151,5 +151,9 @@ public abstract class SectionRecyclerAdapter<T, VH extends RecyclerView.ViewHold
     public void unregisterAdapterDataObserver(RecyclerView.AdapterDataObserver observer) {
         super.unregisterAdapterDataObserver(observer);
         linkedAdapter.unregisterAdapterDataObserver(observer);
+    }
+
+    public void setItems(List<? extends T> items) {
+        linkedAdapter.setItems(items);
     }
 }
