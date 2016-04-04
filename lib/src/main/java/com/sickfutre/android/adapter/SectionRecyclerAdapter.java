@@ -77,14 +77,6 @@ public abstract class SectionRecyclerAdapter<T, VH extends RecyclerView.ViewHold
         }
     }
 
-    private boolean isTheSame(final String previousSection, final String newSection) {
-        if (previousSection == null) {
-            return newSection == null;
-        } else {
-            return previousSection.equals(newSection);
-        }
-    }
-
     public synchronized boolean isSection(final int position) {
         return sectionPositions.containsKey(position);
     }
