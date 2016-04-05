@@ -1,5 +1,6 @@
 package com.sickfutre.android.adapter;
 
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -75,6 +76,18 @@ public abstract class SectionRecyclerAdapter<T, VH extends RecyclerView.ViewHold
             itemPositions.put(currentPosition, i);
             currentPosition++;
         }
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        final GridLayoutManager layoutManager = (GridLayoutManager)(recyclerView.getLayoutManager());
+        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return (isSection(position))? layoutManager.getSpanCount() : 1 ;
+            }
+        });
     }
 
     public synchronized boolean isSection(final int position) {
