@@ -81,13 +81,15 @@ public abstract class SectionRecyclerAdapter<T, VH extends RecyclerView.ViewHold
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-        final GridLayoutManager layoutManager = (GridLayoutManager)(recyclerView.getLayoutManager());
-        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                return (isSection(position))? layoutManager.getSpanCount() : 1 ;
-            }
-        });
+        if (recyclerView.getLayoutManager() instanceof GridLayoutManager) {
+            final GridLayoutManager layoutManager = (GridLayoutManager)(recyclerView.getLayoutManager());
+            layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    return (isSection(position))? layoutManager.getSpanCount() : 1 ;
+                }
+            });
+        }
     }
 
     public synchronized boolean isSection(final int position) {
@@ -98,7 +100,7 @@ public abstract class SectionRecyclerAdapter<T, VH extends RecyclerView.ViewHold
         return sectionPositions.get(position);
     }
 
-    protected Integer getLinkedPosition(final int position) {
+    public Integer getLinkedPosition(final int position) {
         return itemPositions.get(position);
     }
 
