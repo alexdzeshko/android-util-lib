@@ -17,6 +17,8 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +28,7 @@ public class ImagePicker {
     private static final String TAG = "ImagePicker";
     private static final String TEMP_IMAGE_NAME = "tempImage";
 
-    public static int minWidthQuality = DEFAULT_MIN_WIDTH_QUALITY;
+    public static int maxImageSize = DEFAULT_MIN_WIDTH_QUALITY;
 
 
     public static Intent getPickImageIntent(Context context, String dialogTitle) {
@@ -63,11 +65,12 @@ public class ImagePicker {
     }
 
 
-    public static Bitmap getImageFromResult(Context context, int resultCode, Intent imageReturnedIntent, File file) {
+    public static ImageResult getImageFromResult(Context context, int resultCode, Intent imageReturnedIntent) {
         Log.d(TAG, "getImageFromResult, resultCode: " + resultCode);
         Bitmap bm = null;
         if (resultCode == Activity.RESULT_OK) {
             Uri selectedImage;
+            File file = getTempFile(context);
             boolean isCamera = (imageReturnedIntent == null ||
                     imageReturnedIntent.getData() == null ||
                     imageReturnedIntent.getData().toString().contains(file.toString()));
@@ -81,10 +84,45 @@ public class ImagePicker {
             bm = getImageResized(context, selectedImage);
             int rotation = getRotation(context, selectedImage, isCamera);
             bm = rotate(bm, rotation);
+            writeBitmapToFile(file, bm);
+            return new ImageResult(bm, file);
         }
-        return bm;
+        return null;
     }
 
+    private static void writeBitmapToFile(final File tempFile, final Bitmap bitmap) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                FileOutputStream out = null;
+                try {
+                    out = new FileOutputStream(tempFile);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+                    // PNG is a lossless format, the compression factor (100) is ignored
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (out != null) {
+                            out.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+    }
+
+    public static class ImageResult {
+        public final Bitmap bitmap;
+        public final File file;
+
+        public ImageResult(Bitmap bitmap, File file) {
+            this.bitmap = bitmap;
+            this.file = file;
+        }
+    }
 
     public static File getTempFile(Context context) {
         File imageFile = new File(context.getExternalCacheDir(), TEMP_IMAGE_NAME);
@@ -116,18 +154,11 @@ public class ImagePicker {
      **/
     private static Bitmap getImageResized(Context context, Uri selectedImage) {
         Bitmap bm;
-        int[] sampleSizes = new int[]{5, 3, 2, 1};
-        int i = 0;
-        do {
-            bm = decodeBitmap(context, selectedImage, sampleSizes[i]);
-            if (bm == null) {
-                break;
-            }
-            Log.d(TAG, "resizer: new bitmap width = " + bm.getWidth());
-            i++;
-
-        } while (bm.getWidth() > minWidthQuality && i < sampleSizes.length);
-
+        bm = decodeBitmap(context, selectedImage, 1);
+        if (bm != null) {
+            double aspectRatio = (double)bm.getHeight() / bm.getWidth();
+            bm = Bitmap.createScaledBitmap(bm, 300, (int) (aspectRatio * 300), true);
+        }
         return bm;
     }
 
