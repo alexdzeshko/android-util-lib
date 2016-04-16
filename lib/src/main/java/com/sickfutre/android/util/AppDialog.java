@@ -48,16 +48,19 @@ public class AppDialog extends Dialog implements View.OnClickListener {
                 if (mPositiveListener != null) {
                     mPositiveListener.onClick(this, BUTTON_POSITIVE);
                 }
+                break;
             }
             case android.R.id.button2: {
                 if (mNeutralListener != null) {
                     mNeutralListener.onClick(this, BUTTON_NEUTRAL);
                 }
+                break;
             }
             case android.R.id.button3: {
                 if (mNegativeListener != null) {
                     mNegativeListener.onClick(this, BUTTON_NEGATIVE);
                 }
+                break;
             }
         }
     }
