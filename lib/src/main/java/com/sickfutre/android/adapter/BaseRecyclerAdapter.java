@@ -1,6 +1,7 @@
 package com.sickfutre.android.adapter;
 
 import android.support.annotation.IntDef;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.MotionEventCompat;
@@ -389,6 +390,10 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
             views = new ViewMap(itemView);
             putViewsIntoMap(views);
             addClicks(views);
+        }
+
+        public BaseViewHolder(@LayoutRes int layout, @NonNull LayoutInflater inflater, ViewGroup parent) {
+            this(inflater.inflate(layout, parent, false));
         }
 
         protected void addClicks(ViewMap views) {
