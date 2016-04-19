@@ -110,6 +110,15 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return getItemType(getItem(position));
+    }
+
+    public int getItemType(T t) {
+        return 0;
+    }
+
+    @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         gestureDetector = new GestureDetectorCompat(recyclerView.getContext(), new GestureListener(recyclerView));
