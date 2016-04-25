@@ -69,9 +69,9 @@ public class ImagePicker {
     }
 
     public static boolean getImageFromResultAsync(Context context, int requestCode, int resultCode, Intent imageReturnedIntent,
-                                                      Properties properties, @NonNull Procedure<ImageResult> onComplete) {
+                                                  Properties properties, @NonNull Procedure<ImageResult> onSelected, @NonNull Procedure<ImageResult> onComplete) {
         if (requestCode == REQUEST_CODE_IMAGE) {
-            getImageFromResultAsync(context, resultCode, imageReturnedIntent, properties, onComplete);
+            getImageFromResultAsync(context, resultCode, imageReturnedIntent, properties, onSelected, onComplete);
             return true;
         } else {
             return false;
@@ -79,7 +79,7 @@ public class ImagePicker {
     }
 
     public static void getImageFromResultAsync(final Context context, int resultCode, Intent imageReturnedIntent,
-                                               Properties properties, @NonNull final Procedure<ImageResult> onComplete) {
+                                               Properties properties, Procedure<ImageResult> onSelected, @NonNull final Procedure<ImageResult> onComplete) {
         if (resultCode == Activity.RESULT_OK) {
 
             final Uri selectedImage;
@@ -104,6 +104,9 @@ public class ImagePicker {
 
             final int finalMinSize = minSize;
             final int finalMaxSize = maxSize;
+            if (onSelected != null) {
+                onSelected.apply(new ImageResult(null, file));
+            }
             new AsyncTask<Void, Void, ImageResult>() {
                 @Override
                 protected ImageResult doInBackground(Void... params) {
