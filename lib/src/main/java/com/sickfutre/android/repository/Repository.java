@@ -2,18 +2,18 @@ package com.sickfutre.android.repository;
 
 import java.util.List;
 
-public interface Repository<T> {
-    void add(T item);
+public interface Repository<Entity, QuerySpec extends Repository.Specification> {
+    void add(Entity item);
 
-    void add(Iterable<T> items);
+    void add(Iterable<Entity> items);
 
-    void update(T item);
+    void update(Entity item);
 
-    void remove(T item);
+    void remove(Entity item);
 
-    void remove(Specification specification);
+    void remove(QuerySpec specification);
 
-    List<T> query(Specification specification);
+    List<Entity> query(QuerySpec specification);
 
     interface Specification {
     }
