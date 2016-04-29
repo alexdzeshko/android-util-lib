@@ -1,11 +1,12 @@
 package com.sickfutre.android.repository;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface Repository<Entity> {
     void add(Entity item);
 
-    void add(Iterable<Entity> items);
+    void add(Collection<Entity> items);
 
     void update(Entity item);
 

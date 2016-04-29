@@ -20,16 +20,16 @@ public class CursorUtils {
 
     public static String getString(String columnName, Cursor cursor) {
         int columnIndex = cursor.getColumnIndex(columnName);
-        return (columnIndex == -1) ? "[" + columnName + "]" : cursor.getString(columnIndex);
+        return (columnIndex == -1) ? null : cursor.getString(columnIndex);
     }
 
-    public static Integer getInteger(String columnName, Cursor cursor) {
+    public static Integer getInt(String columnName, Cursor cursor) {
         int columnIndex = cursor.getColumnIndex(columnName);
         return (columnIndex == -1) ? -1 : cursor.getInt(columnIndex);
     }
 
     public static byte getByte(String columnName, Cursor cursor) {
-        return getInteger(columnName, cursor).byteValue();
+        return getInt(columnName, cursor).byteValue();
     }
 
     public static Double getDouble(String columnName, Cursor cursor) {
@@ -65,6 +65,10 @@ public class CursorUtils {
 
     public static boolean isEmpty(Cursor cursor) {
         return cursor == null || cursor.getCount() == 0;
+    }
+
+    public static boolean notEmpty(Cursor cursor) {
+        return cursor != null && cursor.getCount() > 0;
     }
 
     public static void close(Cursor cursor) {
