@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.util.Log;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class CursorUtils {
@@ -63,6 +65,18 @@ public class CursorUtils {
         return cursor.getBlob(columnIndex);
     }
 
+    public static Date getDate(String columnName, Cursor cursor) {
+        Long millis = getLong(columnName, cursor);
+        if (millis > 0) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(millis);
+            return calendar.getTime();
+        } else {
+            return null;
+        }
+
+    }
+
     public static boolean isEmpty(Cursor cursor) {
         return cursor == null || cursor.getCount() == 0;
     }
@@ -113,7 +127,7 @@ public class CursorUtils {
                 StringBuilder builder = new StringBuilder(">>>>> Dumping cursor for ");
                 builder.append(uri).append("\n");
                 do {
-                    builder.append(cursor.getPosition()+1).append(DIVIDER).append("\n");
+                    builder.append(cursor.getPosition() + 1).append(DIVIDER).append("\n");
                     for (int i = 0; i < cursor.getColumnCount(); i++) {
                         String columnName = cursor.getColumnName(i);
                         String value = "";
@@ -156,7 +170,7 @@ public class CursorUtils {
                 StringBuilder builder = new StringBuilder(">>>>> Dumping cursor for ");
                 builder.append(uri).append("\n");
                 do {
-                    builder.append(cursor.getPosition()+1).append(DIVIDER).append("\n");
+                    builder.append(cursor.getPosition() + 1).append(DIVIDER).append("\n");
                     for (int i = 0; i < cursor.getColumnCount(); i++) {
                         String columnName = cursor.getColumnName(i);
                         String value = "";
@@ -184,10 +198,10 @@ public class CursorUtils {
                 } while (cursor.moveToNext());
                 return builder.toString();
             } else {
-                return  "cursor for " + uri + " is empty";
+                return "cursor for " + uri + " is empty";
             }
         } else {
-            return  "cursor " + uri + " null or closed";
+            return "cursor " + uri + " null or closed";
         }
     }
 }
