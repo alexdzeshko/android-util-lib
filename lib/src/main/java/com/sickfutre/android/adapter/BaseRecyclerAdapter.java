@@ -245,6 +245,12 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
 
     public void setSortComparator(Comparator<? super T> mSortComparator) {
         this.mSortComparator = mSortComparator;
+        if (mFilter == null) {
+            Collections.sort(mOriginalValues, mSortComparator);
+        } else {
+            Collections.sort(mFilteredValues, mSortComparator);
+        }
+        notifyDataSetChanged();
     }
 
     public void add(int position, T item) {
