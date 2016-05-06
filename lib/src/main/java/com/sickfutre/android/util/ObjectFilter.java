@@ -24,7 +24,6 @@ public abstract class ObjectFilter<T> extends Filter {
             filterResults.values = objects;
         } else {
             List<T> results = new ArrayList<>();
-            final String formattedQuery = constraint.toString().toLowerCase();
             for (T t : objects) {
                 if (acceptable(t, constraint)) {
                     results.add(t);
