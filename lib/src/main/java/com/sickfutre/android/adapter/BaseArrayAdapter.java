@@ -40,11 +40,11 @@ public abstract class BaseArrayAdapter<T> extends ArrayAdapter<T> implements IBa
 
     public BaseArrayAdapter(Context context) {
         super(context, 0);
+        setDropDownViewResource(getDropDownLayoutRes());
     }
 
     public BaseArrayAdapter(Context context, List<T> items) {
         this(context);
-        setDropDownViewResource(getDropDownLayoutRes());
         setItems(items);
     }
 
@@ -52,9 +52,11 @@ public abstract class BaseArrayAdapter<T> extends ArrayAdapter<T> implements IBa
         return 0;
     }
 
-    /* (non-Javadoc)
-     * @see android.widget.ArrayAdapter#getView(int, android.view.View, android.view.ViewGroup)
-     */
+    @Override
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+        return getView(position, convertView, parent);
+    }
+
     public View getView(int position, View convertView, ViewGroup parent) {
         T model = getItem(position);
 
