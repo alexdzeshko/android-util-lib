@@ -100,6 +100,7 @@ fun Cursor.dump() {
         if (moveToFirst()) {
             val builder = StringBuilder(">>>>> Dumping cursor for ")
             builder.append(uri).append("\n")
+                    .append("count: ").append(count).append("\n")
             do {
                 builder.append(position + 1).append(CursorUtils.DIVIDER).append("\n")
                 for (i in 0..columnCount - 1) {
@@ -133,6 +134,8 @@ fun Cursor.dumpToString(): String {
         if (moveToFirst()) {
             val builder = StringBuilder(">>>>> Dumping cursor for ")
             builder.append(uri).append("\n")
+                    .append("count: ").append(count).append("\n")
+
             do {
                 builder.append(position + 1).append(CursorUtils.DIVIDER).append("\n")
                 for (i in 0..columnCount - 1) {
