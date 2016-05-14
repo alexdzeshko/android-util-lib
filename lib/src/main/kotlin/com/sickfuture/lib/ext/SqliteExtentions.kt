@@ -67,13 +67,9 @@ fun Cursor.blob(columnName: String): ByteArray? {
 
 fun Cursor.date(columnName: String): Date? {
     val millis = long(columnName)
-    if (millis > 0) {
-        val calendar = Calendar.getInstance()
-        calendar.timeInMillis = millis
-        return calendar.time
-    } else {
-        return null
-    }
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = millis
+    return calendar.time
 }
 
 fun Cursor.isEmpty(): Boolean = count == 0
