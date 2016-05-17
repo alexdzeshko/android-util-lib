@@ -23,9 +23,11 @@ fun Cursor.cloze() {
     }
 }
 
-fun Cursor.string(columnName: String): String? {
+val EMPTY_STRING = ""
+
+fun Cursor.string(columnName: String): String {
     val columnIndex = getColumnIndex(columnName)
-    return if (columnIndex == -1) null else getString(columnIndex)
+    return if (columnIndex == -1) EMPTY_STRING else getString(columnIndex) ?: EMPTY_STRING
 }
 
 fun Cursor.int(columnName: String): Int {
@@ -65,7 +67,7 @@ fun Cursor.blob(columnName: String): ByteArray? {
     return getBlob(columnIndex)
 }
 
-fun Cursor.date(columnName: String): Date? {
+fun Cursor.date(columnName: String): Date {
     val millis = long(columnName)
     val calendar = Calendar.getInstance()
     calendar.timeInMillis = millis
@@ -81,17 +83,17 @@ fun Cursor.boolean(columnName: String): Boolean {
     return columnIndex != -1 && getInt(columnIndex) == 1
 }
 
-fun Cursor.getNotificationUri(): String {
+fun Cursor.getNotificationURI(): String {
     if (Platform.hasKK()) {
         if (notificationUri != null) {
             return notificationUri.toString()
         }
     }
-    return ""
+    return EMPTY_STRING
 }
 
 fun Cursor.dump() {
-    val uri = notificationUri
+    val uri = getNotificationURI()
     if (!isClosed) {
         if (moveToFirst()) {
             val builder = StringBuilder(">>>>> Dumping cursor for ")
@@ -125,7 +127,7 @@ fun Cursor.dump() {
 }
 
 fun Cursor.dumpToString(): String {
-    val uri = notificationUri
+    val uri = getNotificationURI()
     if (!isClosed) {
         if (moveToFirst()) {
             val builder = StringBuilder(">>>>> Dumping cursor for ")
