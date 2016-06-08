@@ -120,7 +120,6 @@ public class ImagePicker {
                 @Override
                 protected void onPostExecute(ImageResult imageResult) {
                     onComplete.apply(imageResult);
-
                 }
             }.execute();
         }
