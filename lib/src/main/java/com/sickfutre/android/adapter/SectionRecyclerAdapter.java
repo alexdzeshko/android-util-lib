@@ -68,7 +68,7 @@ public abstract class SectionRecyclerAdapter<T, VH extends RecyclerView.ViewHold
             final T item = linkedAdapter.getItem(i);
 
             int sectionCode = sectionCode(item);
-            if (currentSection!= sectionCode) {
+            if (currentSection != sectionCode) {
                 sectionPositions.put(currentPosition, sectionCode);
                 currentSection = sectionCode;
                 currentPosition++;
@@ -82,11 +82,11 @@ public abstract class SectionRecyclerAdapter<T, VH extends RecyclerView.ViewHold
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         if (recyclerView.getLayoutManager() instanceof GridLayoutManager) {
-            final GridLayoutManager layoutManager = (GridLayoutManager)(recyclerView.getLayoutManager());
+            final GridLayoutManager layoutManager = (GridLayoutManager) (recyclerView.getLayoutManager());
             layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
                 public int getSpanSize(int position) {
-                    return (isSection(position))? layoutManager.getSpanCount() : 1 ;
+                    return (isSection(position)) ? layoutManager.getSpanCount() : 1;
                 }
             });
         }
@@ -132,7 +132,7 @@ public abstract class SectionRecyclerAdapter<T, VH extends RecyclerView.ViewHold
 
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-        if(viewType == sectionViewType()) {
+        if (viewType == sectionViewType()) {
             return viewHolder(LayoutInflater.from(parent.getContext()), parent, viewType);
         } else {
             return linkedAdapter.onCreateViewHolder(parent, viewType);
@@ -141,7 +141,7 @@ public abstract class SectionRecyclerAdapter<T, VH extends RecyclerView.ViewHold
 
     @Override
     public void onBindViewHolder(VH holder, int position) {
-        if(isSection(position)) {
+        if (isSection(position)) {
             onBindItemViewHolder(holder, sectionPositions.get(position), position);
         } else {
             linkedAdapter.onBindViewHolder(holder, getLinkedPosition(position));
