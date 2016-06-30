@@ -163,4 +163,18 @@ public abstract class SectionRecyclerAdapter<T, VH extends RecyclerView.ViewHold
     public void setItems(List<? extends T> items) {
         linkedAdapter.setItems(items);
     }
+
+    public T getItem(int position) {
+        if(!isSection(position)) {
+            return linkedAdapter.getItem(getLinkedPosition(position));
+        } else {
+            return null;
+        }
+    }
+
+    public void remove(int position) {
+        if(!isSection(position)) {
+            linkedAdapter.removeChild(getLinkedPosition(position));
+        }
+    }
 }
