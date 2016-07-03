@@ -5,6 +5,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -176,5 +178,9 @@ public abstract class SectionRecyclerAdapter<T, VH extends RecyclerView.ViewHold
         if(!isSection(position)) {
             linkedAdapter.removeChild(getLinkedPosition(position));
         }
+    }
+
+    public void appendItems(@NotNull List<T> items) {
+        linkedAdapter.addAll(items);
     }
 }
