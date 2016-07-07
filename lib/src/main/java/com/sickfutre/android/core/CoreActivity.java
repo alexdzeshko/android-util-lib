@@ -80,6 +80,14 @@ public class CoreActivity extends AppCompatActivity {
         }
     }
 
+    public void closeFromChild() {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStack();
+        } else {
+            supportFinishAfterTransition();
+        }
+    }
+
     private boolean interruptedByListener() {
         boolean interrupt = false;
         for (OnBackPressListener listener : mOnBackPressListeners) {

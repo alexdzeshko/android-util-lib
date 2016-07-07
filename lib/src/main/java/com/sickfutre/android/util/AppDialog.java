@@ -65,6 +65,15 @@ public class AppDialog extends Dialog implements View.OnClickListener {
         }
     }
 
+    @Override
+    public View findViewById(int id) {
+        View view = super.findViewById(id);
+        if (view == null && mView != null) {
+            view = mView.findViewById(id);
+        }
+        return view;
+    }
+
     public static class Builder {
 
         private AppDialog dialog;
