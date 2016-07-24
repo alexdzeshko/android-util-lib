@@ -21,9 +21,11 @@ public class Intents {
         return dispatchIntentExternal(context, intent);
     }
 
-    public static void email(Context context, String emailAddress) {
+    public static void email(Context context, String emailAddress, String subject, String text) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse("mailto:" + emailAddress));
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent.putExtra(Intent.EXTRA_TEXT, text);
         dispatchIntentExternal(context, intent);
     }
 

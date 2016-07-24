@@ -85,12 +85,14 @@ public abstract class BaseArrayAdapter<T> extends ArrayAdapter<T> implements IBa
     @Override
     public void setItems(List<T> rawList) {
         mOriginalValues.clear();
-        mOriginalValues.addAll(rawList);
+        if (rawList!=null) {
+            mOriginalValues.addAll(rawList);
 
-        if (mSortComparator != null) {
-            Collections.sort(mOriginalValues, mSortComparator);
+            if (mSortComparator != null) {
+                Collections.sort(mOriginalValues, mSortComparator);
+            }
+
         }
-
         applyFilter();
 
     }
