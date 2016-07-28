@@ -259,14 +259,12 @@ public class Strings {
 
         for (String s : ss) {
             if (!isEmpty(s)) {
-                if (value.length() > 0) {
-                    value.append(sep);
-                }
-
-                value.append(transformer == null ? s : transformer.apply(s));
+                value.append(transformer == null ? s : transformer.apply(s)).append(sep);
             }
         }
-
+        if (value.length() > 0) {
+            value.delete(value.length() - sep.length(), value.length());
+        }
         return value.toString();
     }
 
