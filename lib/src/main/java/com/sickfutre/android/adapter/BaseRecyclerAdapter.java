@@ -92,7 +92,7 @@ public abstract class BaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
         onBindItemViewHolder(holder, getItem(position), position, getItemViewType(position));
     }
 
-    protected T getItem(int position) {
+    public T getItem(int position) {
         if (mFilter != null) {
             return mFilteredValues.get(position);
         } else {
