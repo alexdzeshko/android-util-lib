@@ -54,6 +54,17 @@ public class Intents {
         }
     }
 
+    public static boolean map(Context context, double lat, double lng) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(String.format("geo:%s,%s", lat, lng)));
+        if (queryIntents(context, intent)) {
+            dispatchIntentExternal(context, intent);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private static boolean dispatchIntentExternal(Context context, Intent intent) {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         if (queryIntents(context, intent)) {
@@ -75,8 +86,8 @@ public class Intents {
         }
     }
 
-    private static boolean queryIntents(Context context, Intent rateAppIntent) {
-        return context.getPackageManager().queryIntentActivities(rateAppIntent, PackageManager.MATCH_DEFAULT_ONLY).size() > 0;
+    private static boolean queryIntents(Context context, Intent intent) {
+        return context.getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY).size() > 0;
     }
 
     public static void calendarEvent(Context context, long startMillis, long endMillis, String title, String description, String location) {
