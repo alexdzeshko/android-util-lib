@@ -2,7 +2,6 @@ package com.sickfutre.android.adapter;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
@@ -52,7 +51,7 @@ public abstract class MapRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
                 vh.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        onSectionClick(vh.getAdapterPosition());
+                        onSectionClick(vh);
                     }
                 });
             }
@@ -71,7 +70,8 @@ public abstract class MapRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
         }
     }
 
-    private void onSectionClick(int adapterPosition) {
+    private void onSectionClick(VH viewHolder) {
+        int adapterPosition = viewHolder.getAdapterPosition();
         Integer code = positionToSectionCodeMap.get(adapterPosition);
         SectionDataHolder<T> sectionData = dataSet.get(code);
         if (sectionData.isExpanded) {
@@ -86,13 +86,16 @@ public abstract class MapRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
             updateInternalStructures();
             notifyItemRangeInserted(adapterPosition + 1, sectionData.data.size());
         }
+        onSectionClick(viewHolder, sectionData);
+    }
+
+    protected void onSectionClick(VH viewHolder, SectionDataHolder<T> sectionData) {
+        //NO-OP
     }
 
     @Override
     public int getItemCount() {
-        int count = headers.size() + dataSet.size() + countItems();
-        Log.d(TAG, "getItemCount: " + count);
-        return count;
+        return headers.size() + dataSet.size() + countItems();
     }
 
     private int countItems() {
@@ -121,22 +124,24 @@ public abstract class MapRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
         }
     }
 
+    public T getItem(int position) {
+        return positionToItemMap.get(position);
+    }
+
     public void setItems(List<? extends T> items) {
         dataSet.clear();
-        viewTypes.clear();
-        positionToSectionCodeMap.clear();
-        positionToItemMap.clear();
         for (T item : items) {
             int sectionCode = sectionCode(item);
             SectionDataHolder<T> sectionData = dataSet.get(sectionCode);
             if (sectionData == null) {
                 sectionData = new SectionDataHolder<>();
-                sectionData.code = sectionCode;
+                sectionData.setCode(sectionCode);
                 dataSet.put(sectionCode, sectionData);
             }
             sectionData.data.add(item);
         }
         updateInternalStructures();
+        notifyDataSetChanged();
     }
 
     private void updateInternalStructures() {
