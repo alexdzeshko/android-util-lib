@@ -1,13 +1,15 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
+def versions = rootProject.ext.versions
+
 android {
-    compileSdkVersion compileSdk
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion targetSdk
+        targetSdkVersion versions.targetSdk
         versionCode 1
         versionName "1.0"
     }
@@ -23,10 +25,10 @@ android {
 }
 
 dependencies {
-    compile "com.android.support:appcompat-v7:$supportLibVersion"
-    compile "com.android.support:recyclerview-v7:$supportLibVersion"
+    compile "com.android.support:appcompat-v7:${versions.support}"
+    compile "com.android.support:recyclerview-v7:${versions.support}"
     testCompile 'junit:junit:4.12'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:${versions.kotlin}"
 }
 
 repositories {
