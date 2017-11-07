@@ -26,7 +26,3 @@ fun View.invisible() {
 fun TextView.drawableLeft(drawable: Int): Unit {
     setCompoundDrawablesWithIntrinsicBounds(drawable, 0, 0, 0)
 }
-
-fun <T> View.findById(id: Int): T {
-    return findViewById(id) as T
-}
